@@ -17,7 +17,7 @@ Route::post('/register', function (Request $request) {
         'name'     => 'required',
     ]);
 
-    $user = User::create($request->validated());
+    $user = User::create($request->all());
 
     return response($user->createToken('token')->plainTextToken);
 });
@@ -36,7 +36,7 @@ Route::post('/login', function (Request $request) {
         ]);
     }
 
-    $user->currentAccessToken()->delete();
+    //$user->currentAccessToken()->delete();
  
     return $user->createToken('access_token')->plainTextToken;
 });
