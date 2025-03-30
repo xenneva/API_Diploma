@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\TestController;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -36,13 +37,11 @@ Route::post('/login', function (Request $request) {
         ]);
     }
 
-    //$user->currentAccessToken()->delete();
+    $token = $user->createToken('access_token')->plainTextToken;
  
-    return $user->createToken('access_token')->plainTextToken;
+    return response()->json(['token' => $token]);
 });
 
-// Route::post('/tokens/create', function (Request $request) {
-//     $token = $request->user()->createToken('token');
- 
-//     return ['token' => $token->plainTextToken];
-// });
+Route::prefix('/')->group(function () {
+    Route::apiResource('tests', TestController::class);
+})->middleware('auth:sanctum');
