@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\API\QuestionController;
 use App\Http\Controllers\API\TestController;
+use App\Http\Resources\TestPassResource;
+use App\Http\Responses\SuccessResponse;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -51,4 +53,16 @@ Route::prefix('/')->group(function () {
 
     Route::put('/tests/{test}/questions/{question}', [TestController::class, 'addQuestion']);
     Route::delete('/tests/{test}/questions/{question}', [TestController::class, 'removeQuestion']);
+
+    Route::post('/tests/{test}/pass', [TestController::class, 'pass']);
+
+    Route::get('/my', function () {
+        /** @var User $user */
+        $user = auth('sanctum')->user();
+        $tests = $user->tests;
+
+        return new SuccessResponse(
+            data: ['data' => TestPassResource::collection($tests)],
+        );
+    });
 })->middleware('auth:sanctum');

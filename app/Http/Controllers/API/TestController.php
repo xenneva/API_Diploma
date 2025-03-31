@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Test\TestCreateRequest;
+use App\Http\Requests\Test\TestPassRequest;
 use App\Http\Requests\Test\TestUpdateRequest;
 use App\Http\Resources\TestResource;
 use App\Http\Responses\FailResponse;
@@ -97,5 +98,14 @@ class TestController extends Controller
         return $questionAdded
             ? new SuccessResponse(message: 'question removed')
             : new FailResponse(message: 'question remove failed');
+    }
+
+    public function pass(Test $test, TestPassRequest $request): JsonResponse
+    {
+        $pass = $this->service->pass($test, $request->validated());
+
+        return $pass
+            ? new SuccessResponse(message: 'pass saved')
+            : new FailResponse(message: 'pass save fail');
     }
 }
