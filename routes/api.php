@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\QuestionController;
 use App\Http\Controllers\API\TestController;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -43,5 +44,11 @@ Route::post('/login', function (Request $request) {
 });
 
 Route::prefix('/')->group(function () {
-    Route::apiResource('tests', TestController::class);
+    Route::apiResources([
+        'tests'     => TestController::class,
+        'questions' => QuestionController::class
+    ]);
+
+    Route::put('/tests/{test}/questions/{question}', [TestController::class, 'addQuestion']);
+    Route::delete('/tests/{test}/questions/{question}', [TestController::class, 'removeQuestion']);
 })->middleware('auth:sanctum');

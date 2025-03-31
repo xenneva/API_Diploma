@@ -6,16 +6,17 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-class Test extends Model
+class Question extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'name'
+        'text',
+        'answer',
     ];
 
-    public function questions(): BelongsToMany
+    public function tests(): BelongsToMany
     {
-        return $this->belongsToMany(Question::class);
+        return $this->belongsToMany(Test::class);
     }
 }

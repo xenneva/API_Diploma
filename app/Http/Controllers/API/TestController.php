@@ -8,6 +8,7 @@ use App\Http\Requests\Test\TestUpdateRequest;
 use App\Http\Resources\TestResource;
 use App\Http\Responses\FailResponse;
 use App\Http\Responses\SuccessResponse;
+use App\Models\Question;
 use App\Models\Test;
 use App\Services\TestService;
 use Illuminate\Http\JsonResponse;
@@ -78,5 +79,23 @@ class TestController extends Controller
         return $isDeleted
             ? new SuccessResponse(message: 'test deleted')
             : new FailResponse(message: 'test delete failed');
+    }
+
+    public function addQuestion(Test $test, Question $question): JsonResponse
+    {
+        $questionAdded = $this->service->addQuestion($test, $question);
+
+        return $questionAdded
+            ? new SuccessResponse(message: 'question added')
+            : new FailResponse(message: 'question add failed');
+    }
+
+    public function removeQuestion(Test $test, Question $question): JsonResponse
+    {
+        $questionAdded = $this->service->removeQuestion($test, $question);
+
+        return $questionAdded
+            ? new SuccessResponse(message: 'question removed')
+            : new FailResponse(message: 'question remove failed');
     }
 }

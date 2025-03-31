@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class TestResource extends JsonResource
+class QuestionResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,8 +16,8 @@ class TestResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'name' => $this->name,
-            'questions' => $this->when(request()->routeIs('tests.show'), QuestionResource::collection($this->questions)),
+            'text' => $this->text,
+            'answer' => $this->answer,
         ];
     }
 }

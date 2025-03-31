@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Question;
 use App\Models\Test;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -30,5 +31,19 @@ class TestService
     public function delete(Test $test): bool
     {
         return $test->delete();
+    }
+
+    public function addQuestion(Test $test, Question $question): bool
+    {
+        $test->questions()->attach($question->id);
+
+        return true;
+    }
+
+    public function removeQuestion(Test $test, Question $question): bool
+    {
+        $test->questions()->detach([$question->id]);
+
+        return true;
     }
 }
