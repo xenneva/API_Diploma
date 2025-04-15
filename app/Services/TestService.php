@@ -53,7 +53,6 @@ class TestService
         $questions = $test->questions;
 
         $correctAnswers = 0;
-        //dd($data);
 
         foreach ($data['answers'] as $answerData) {
             $id = $answerData['id'];
@@ -67,18 +66,12 @@ class TestService
             }
         }
 
-        $score = (float)($correctAnswers/count($questions));
+        $score = (float)($correctAnswers/count($questions))*100;
         
         /** @var User $user */
         $user = auth('sanctum')->user();
-
-        $testPass = $user->tests->firstWhere('id', '=', $test->id);
-        if ($testPass && $testPass->pivot->score < $score) {
-            $user->tests()->detach([$test->id]);
-            $user->tests()->attach($test->id, ['score' => $score]);
-        } else if (!$testPass) {
-            $user->tests()->attach($test->id, ['score' => $score]);
-        }
+        
+        $user->tests()->attach($test->id, ['score' => $score, 'created_at' => now()->timezone(4)]);
 
         return true;
     }

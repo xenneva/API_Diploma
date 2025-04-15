@@ -50,6 +50,6 @@ class User extends Authenticatable
 
     public function tests(): BelongsToMany
     {
-        return $this->belongsToMany(Test::class)->withPivot('score');
+        return $this->belongsToMany(Test::class)->withPivot(['score', 'created_at']);
     }
 }

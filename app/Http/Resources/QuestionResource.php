@@ -17,7 +17,7 @@ class QuestionResource extends JsonResource
         return [
             'id' => $this->id,
             'text' => $this->text,
-            'answer' => $this->answer,
+            'answer' => $this->when(request()->routeIs('questions.*'), $this->answer),
         ];
     }
 }
