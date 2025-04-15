@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\API\QuestionController;
 use App\Http\Controllers\API\TestController;
+use App\Http\Controllers\API\UserController;
 use App\Http\Resources\TestPassResource;
 use App\Http\Responses\SuccessResponse;
 use App\Models\User;
@@ -45,24 +46,23 @@ Route::post('/login', function (Request $request) {
     return response()->json(['token' => $token]);
 });
 
-Route::prefix('/')->group(function () {
-    Route::apiResources([
-        'tests'     => TestController::class,
-        'questions' => QuestionController::class
-    ]);
+Route::apiResource('tests', TestController::class)->middleware('auth:sanctum');
+Route::apiResource('questions', QuestionController::class)->middleware('auth:sanctum');
 
-    Route::put('/tests/{test}/questions/{question}', [TestController::class, 'addQuestion']);
-    Route::delete('/tests/{test}/questions/{question}', [TestController::class, 'removeQuestion']);
+Route::put('/tests/{test}/questions/{question}', [TestController::class, 'addQuestion'])->middleware('auth:sanctum');
+Route::delete('/tests/{test}/questions/{question}', [TestController::class, 'removeQuestion'])->middleware('auth:sanctum');
 
-    Route::post('/tests/{test}/pass', [TestController::class, 'pass']);
+Route::post('/tests/{test}/pass', [TestController::class, 'pass'])->middleware('auth:sanctum');
 
-    Route::get('/my', function () {
-        /** @var User $user */
-        $user = auth('sanctum')->user();
-        $tests = $user->tests;
+Route::get('/my', function () {
+    /** @var User $user */
+    $user = auth('sanctum')->user();
+    $tests = $user->tests;
 
-        return new SuccessResponse(
-            data: ['data' => TestPassResource::collection($tests)],
-        );
-    });
+    return new SuccessResponse(
+        data: ['data' => TestPassResource::collection($tests)],
+    );
 })->middleware('auth:sanctum');
+
+Route::get('/me', [UserController::class, 'myInfo'])->middleware('auth:sanctum');
+Route::put('/updateUser', [UserController::class, 'update'])->middleware('auth:sanctum');
