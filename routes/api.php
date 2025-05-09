@@ -57,7 +57,9 @@ Route::post('/tests/{test}/pass', [TestController::class, 'pass'])->middleware('
 Route::get('/my', function () {
     /** @var User $user */
     $user = auth('sanctum')->user();
-    $tests = $user->tests;
+
+    // Получаем тесты пользователя и сортируем их по pass_time
+    $tests = $user->tests()->orderBy('created_at', 'desc')->get();
 
     return new SuccessResponse(
         data: ['data' => TestPassResource::collection($tests)],

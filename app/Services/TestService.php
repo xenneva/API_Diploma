@@ -12,8 +12,8 @@ class TestService
     public function index(): Collection
     {
         return Test::query()
-            ->orderBy('id')
-            ->get();
+        ->orderBy('created_at', 'desc') // Сортируем по времени прохождения (created_at)
+        ->get();
     }
 
     public function create(array $data): ?Test
