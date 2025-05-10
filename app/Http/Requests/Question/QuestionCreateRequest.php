@@ -24,6 +24,7 @@ class QuestionCreateRequest extends FormRequest
         return [
             'text' => 'required|string',
             'answer' => 'required|string',
+            'enable_synonyms' => 'required|boolean',
         ];
     }
 }

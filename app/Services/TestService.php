@@ -6,9 +6,12 @@ use App\Models\Question;
 use App\Models\Test;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\DB;
 
 class TestService
 {
+    const MAX_ANSWERS = 11;
+
     public function index(): Collection
     {
         return Test::query()
@@ -61,7 +64,25 @@ class TestService
                 return $question->id === $id;
             });
 
-            if ($question && $question->answer === $answerData['answer']) {
+            if (!$question) {
+                continue;
+            }
+
+            $answers = [$question->answer];
+
+            if ($question->enable_synonyms) {
+                $synonyms_data = DB::table('synonyms')->where('word', $question->answer)->first();
+                
+                foreach (json_decode($synonyms_data->synonyms) as $synonym) {
+                    $answers[] = $synonym;
+
+                    if (count($answers) > self::MAX_ANSWERS) {
+                        break;
+                    }
+                }
+            }
+
+            if (in_array($answerData['answer'], $answers)) {
                 $correctAnswers++;
             }
         }
