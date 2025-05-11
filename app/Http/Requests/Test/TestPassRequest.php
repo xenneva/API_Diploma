@@ -22,7 +22,9 @@ class TestPassRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'answers' => 'required|array',
+            'try' => 'required|array',
+            'try.*.id' => 'required|int|exists:questions,id',
+            'try.*.answers' => 'required|array'
         ];
     }
 }

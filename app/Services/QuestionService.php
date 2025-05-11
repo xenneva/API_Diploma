@@ -2,9 +2,11 @@
 
 namespace App\Services;
 
+use App\Enums\QuestionTypes;
 use App\Models\Question;
 use GuzzleHttp\Client;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 
 class QuestionService
@@ -21,8 +23,14 @@ class QuestionService
 
     public function create(array $data): ?Question
     {
+        $answers = $data['answers'];
+
         /** @var Question $question */
-        $question = Question::query()->create($data);
+        $question = Question::query()->create(Arr::except($data, 'answers'));
+
+        foreach ($answers as $answer) {
+            $question->answers()->create(['answer' => $answer['text'], 'is_correct' => $answer['is_correct']]);
+        }
 
         self::processSynonyms($question);
 
@@ -41,18 +49,21 @@ class QuestionService
 
     private function processSynonyms(Question $question): void
     {
-        if ($question->enable_synonyms && !DB::table('synonyms')->where('word', $question->answer)->exists()) {
+        $synonyms_enabled = $question->enable_synonyms && $question->type === QuestionTypes::SIMPLE->value;
+        $answer = $synonyms_enabled ? $question->answers->first()->answer : '';
+
+        if ($question->enable_synonyms && !DB::table('synonyms')->where('word', $answer)->exists()) {
             $client = new Client([
                 'headers' => ['X-Api-Key' => self::DICTIONARY_API_KEY],
                 'verify' => false
             ]);
 
-            $response = $client->get(self::DICTIONARY_URL . $question->answer);
+            $response = $client->get(self::DICTIONARY_URL . $answer);
 
             if ($response->getBody()) {
                 $data = json_decode($response->getBody(), true);
 
-                DB::table('synonyms')->insert(['word' => $question->answer, 'synonyms' => json_encode($data['synonyms'])]);
+                DB::table('synonyms')->insert(['word' => $answer, 'synonyms' => json_encode($data['synonyms'])]);
             }
         }
     }

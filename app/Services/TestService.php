@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Enums\QuestionTypes;
+use App\Models\Answer;
 use App\Models\Question;
 use App\Models\Test;
 use App\Models\User;
@@ -57,7 +59,7 @@ class TestService
 
         $correctAnswers = 0;
 
-        foreach ($data['answers'] as $answerData) {
+        foreach ($data['try'] as $answerData) {
             $id = $answerData['id'];
 
             $question = $questions->first(function (Question $question) use ($id) {
@@ -68,9 +70,11 @@ class TestService
                 continue;
             }
 
-            $answers = [$question->answer];
+            $answers = $question->answers()->where('is_correct', true)->get()->map(function (Answer $answer) {
+                return $answer->answer;
+            })->toArray();
 
-            if ($question->enable_synonyms) {
+            if ($question->enable_synonyms && $question->type === QuestionTypes::SIMPLE->value) {
                 $synonyms_data = DB::table('synonyms')->where('word', $question->answer)->first();
                 
                 foreach (json_decode($synonyms_data->synonyms) as $synonym) {
@@ -82,7 +86,34 @@ class TestService
                 }
             }
 
-            if (in_array($answerData['answer'], $answers)) {
+            $correct_answer = true;
+
+            foreach ($answerData['answers'] as $answer) {
+                switch ($question->type) {
+                    case QuestionTypes::SIMPLE->value:
+                    case QuestionTypes::CHOICE->value:
+                        if (in_array($answer, $answers)) {
+                            break;
+                        } else {
+                            $correct_answer = false;
+                        }
+                        break;
+                    case QuestionTypes::MULTY_CHOICE->value:
+                        if (in_array($answer, $answers)) {
+                            $key = array_search($answer, $answers);
+                            unset($answers[$key]);
+                        } else {
+                            $correct_answer = false;
+                        }
+                        break;
+                }
+            }
+
+            if ($question->type == QuestionTypes::MULTY_CHOICE->value && !empty($answers)) {
+                $correct_answer = false;
+            }
+
+            if ($correct_answer) {
                 $correctAnswers++;
             }
         }

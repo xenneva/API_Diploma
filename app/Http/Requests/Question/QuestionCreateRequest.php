@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\Question;
 
+use App\Enums\QuestionTypes;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class QuestionCreateRequest extends FormRequest
 {
@@ -23,8 +25,11 @@ class QuestionCreateRequest extends FormRequest
     {
         return [
             'text' => 'required|string',
-            'answer' => 'required|string',
+            'answers' => 'required|array',
+            'asnwers.*.text' => 'required|string',
+            'asnwers.*.is_correct' => 'required|boolean',
             'enable_synonyms' => 'required|boolean',
+            'type' => [Rule::enum(QuestionTypes::class), 'required'],
         ];
     }
 }
