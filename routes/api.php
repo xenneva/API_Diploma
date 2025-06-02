@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\AutoTestController;
 use App\Http\Controllers\API\QuestionController;
 use App\Http\Controllers\API\TestController;
 use App\Http\Controllers\API\UserController;
@@ -68,3 +69,4 @@ Route::get('/my', function () {
 
 Route::get('/me', [UserController::class, 'myInfo'])->middleware('auth:sanctum');
 Route::put('/updateUser', [UserController::class, 'update'])->middleware('auth:sanctum');
+Route::post('/autoTest', [AutoTestController::class, 'process'])->middleware('auth:sanctum');

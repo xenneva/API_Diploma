@@ -30,6 +30,7 @@ class QuestionCreateRequest extends FormRequest
             'asnwers.*.is_correct' => 'required|boolean',
             'enable_synonyms' => 'required|boolean',
             'type' => [Rule::enum(QuestionTypes::class), 'required'],
+            'level' => 'nullable|integer',
         ];
     }
 }

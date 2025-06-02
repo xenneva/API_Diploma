@@ -14,7 +14,8 @@ class Question extends Model
     protected $fillable = [
         'text',
         'enable_synonyms',
-        'type'
+        'type',
+        'level'
     ];
 
     public function tests(): BelongsToMany
