@@ -23,6 +23,7 @@ class TestCreateRequest extends FormRequest
     {
         return [
             'name' => 'required|string',
+            'level' => 'nullable|integer'
         ];
     }
 }

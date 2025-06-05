@@ -11,7 +11,8 @@ class Test extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name'
+        'name',
+        'level',
     ];
 
     public function questions(): BelongsToMany

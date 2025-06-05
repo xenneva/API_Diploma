@@ -16,6 +16,22 @@ class TestService
 
     public function index(): Collection
     {
+        $user = auth('sanctum')->user();
+        $my_level = request()->query('my_level');
+
+        $previous_level = DB::table('auto_test_passes')
+                ->where('user_id', $user->id)
+                ->whereNotNull('result')
+                ->orderByDesc('id')
+                ->first()?->result;
+
+        if ($my_level && $my_level === 'true' && $previous_level) {
+            return Test::query()
+                ->where('level', $previous_level)
+                ->orderBy('created_at', 'desc') // Сортируем по времени прохождения (created_at)
+                ->get();
+        }
+
         return Test::query()
         ->orderBy('created_at', 'desc') // Сортируем по времени прохождения (created_at)
         ->get();

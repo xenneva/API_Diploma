@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Enums\QuestionLevels;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -18,6 +19,7 @@ class TestResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'questions' => $this->when(request()->routeIs('tests.show'), QuestionResource::collection($this->questions)),
+            'level' => $this->level ? QuestionLevels::toLine($this->level) : null,
         ];
     }
 }
