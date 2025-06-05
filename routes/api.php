@@ -60,7 +60,11 @@ Route::get('/my', function () {
     $user = auth('sanctum')->user();
 
     // Получаем тесты пользователя и сортируем их по pass_time
-    $tests = $user->tests()->orderBy('created_at', 'desc')->get();
+    $tests = $user->tests()->get()->sort(function ($model1, $model2) {
+        if ($model1->pivot->pass_time > $model2->pivot->pass_time) return 1;
+        else if ($model1->pivot->pass_time = $model2->pivot->pass_time) return 0;
+        else return -1;
+    });
 
     return new SuccessResponse(
         data: ['data' => TestPassResource::collection($tests)],

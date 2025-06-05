@@ -26,7 +26,14 @@ class AutoTestController extends Controller
         if (!isset($data['id']) || !$data['id']) {
             $user = auth('sanctum')->user();
             $id = DB::table('auto_test_passes')->insertGetId(['user_id' => $user->id]);
-            $level = self::START_LEVEL->value;
+
+            $previous_level = $level = DB::table('auto_test_passes')
+                ->where('user_id', $user->id)
+                ->whereNotNull('result')
+                ->orderByDesc('id')
+                ->first()?->result;
+
+            $level = $previous_level ?? self::START_LEVEL->value;
             $questions = self::getQuestions($level);
 
             return AutoTestResource::make(['id' => $id, 'questions' => $questions]);
@@ -53,6 +60,10 @@ class AutoTestController extends Controller
                 $tries_count = DB::table('auto_test_passes_iterations')->where('auto_test_pass_id', $data['id'])->count();
 
                 if ($next_level == $previous_level || $tries_count >= 3) {
+                    DB::table('auto_test_passes')
+                        ->where(['id' => $data['id']])
+                        ->update(['result' => $next_level]);
+
                     return AutoTestResultResource::make(['id' => $data['id'], 'level' => QuestionLevels::toLine($next_level)]);
                 } else {
                     DB::table('auto_test_passes_iterations')

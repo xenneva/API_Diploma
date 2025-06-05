@@ -22,6 +22,7 @@ class QuestionResource extends JsonResource
             'type' => $this->type,
             'choices' => $this->when($this->type != QuestionTypes::SIMPLE->value, $this->answers->map(fn (Answer $answer) => $answer->answer)),
             'answers' => $this->when(request()->routeIs('questions.*'), $this->answers),
+            'level' => $this->level,
         ];
     }
 }
